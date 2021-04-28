@@ -1,7 +1,8 @@
 const { Builder, By, Key, util, promise, until } = require("selenium-webdriver");
+ const fs = require('fs');
 //var assert = require("assert");
 //const { ableToSwitchToFrame } = require("selenium-webdriver/lib/until");
-let fs = require('fs');
+
 const { serialize } = require("v8");
 const chrome = require('selenium-webdriver/chrome');
 let opts = new chrome.Options();
@@ -9,24 +10,44 @@ async function extractData() {
   try{
     let driver = new Builder()
     .forBrowser('chrome')
-    .setChromeOptions(opts.headless())
+   // .setChromeOptions(opts.headless())
     .build();
   
-   
   
+    const data=[];
     await  driver.get("https://www.houzz.co.uk/professionals/query/best-15-interior-designers-near-you?tid=1201&p=1");
-    (await (await driver).findElement(By.xpath('/html/body/div[2]/div[5]/div/div/div/button'))).click();
+    await driver.findElement(By.xpath('//*[@id="hz-page"]/div[5]/div/div/div/button')).click();
+  
     for(let page=1;page<5;page++){
         await  driver.get("https://www.houzz.co.uk/professionals/query/best-15-interior-designers-near-you?tid=1201&p="+`${page}`);
+       
+       
     const namestag= await driver.findElements(By.className('mlm'));
-    const phone=await driver.findElements(By.className('hz-pro-search-result__contact-info')).click();
- for(let i=0;i<namestag.length;i++){
-     //let data=await namestag[i].getText();
+   
+   const adress= await driver.findElements(By.className('hz-pro-search-result__contact-info'));
+  
+    const phone =await driver.findElements(By.className('hz-pro-search-result__contact-info'));
+    for(let i=0;i<namestag.length;i++){
+     adress[i].click();
+   
+     
+   
      let phoneNumbers= await phone[i].getText();
      let usersnames=await namestag[i].getText();
-    await console.log( phoneNumbers,usersnames);
+    
+     data.push(phoneNumbers,usersnames);
+    
+     console.log( data);
 }
-}
+}savefile(data);
   }catch(err){console.log(err)}
 }
+
+savefile =(data)=>{
+  fs.writeFileSync('D:/helloworld.csv', data, function (err) {
+    if (err) return console.log(err);
+    console.log('Hello World > helloworld.txt');
+  });
+}
+//savefile();
 extractData();
