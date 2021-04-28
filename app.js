@@ -15,10 +15,12 @@ async function extractData() {
   
   
     const data=[];
+   
+    
     await  driver.get("https://www.houzz.co.uk/professionals/query/best-15-interior-designers-near-you?tid=1201&p=1");
     await driver.findElement(By.xpath('//*[@id="hz-page"]/div[5]/div/div/div/button')).click();
   
-    for(let page=1;page<5;page++){
+    for(let page=1;page<3;page++){
         await  driver.get("https://www.houzz.co.uk/professionals/query/best-15-interior-designers-near-you?tid=1201&p="+`${page}`);
        
        
@@ -30,16 +32,13 @@ async function extractData() {
     for(let i=0;i<namestag.length;i++){
      adress[i].click();
    
-     
-   
      let phoneNumbers= await phone[i].getText();
      let usersnames=await namestag[i].getText();
-    
-     data.push(phoneNumbers,usersnames);
-    
+  
+    data.push({'usersnames':usersnames,'phoneNumbers':phoneNumbers});
      console.log( data);
 }
-}savefile(data);
+}savefile(JSON.stringify(data));
   }catch(err){console.log(err)}
 }
 
